@@ -3,7 +3,7 @@
 """我的第一个窗体程序"""
 
 import wx
-import imageop
+import namemodel
 
 class MyApp(wx.App):
 	def OnInit(self):
@@ -16,12 +16,15 @@ class MyFrame(wx.Frame):
 	def __init__(self, parent = None, title = u'收银系统', size = wx.DefaultSize, pos = wx.DefaultPosition):
 		wx.Frame.__init__(self, parent, title = title, size = size, pos = pos, style = wx.DEFAULT_FRAME_STYLE)
 
+		self.textFields = {}
+
 		#面板
 		panel = wx.Panel(self)
 		panel.SetBackgroundColour('White')
 
 		#按钮
 		button = wx.Button(panel, label = u'对话...', size = (100, 30), pos = (20, 20))
+		self.Bind(wx.EVT_BUTTON, self.OnButton, button)
 
 		#状态栏、工具栏
 		self.CreateStatusBar()
@@ -36,11 +39,20 @@ class MyFrame(wx.Frame):
 		self.menuBar.Append(menu1, title = u'菜单')
 		self.SetMenuBar(self.menuBar)
 
+		self.textFields['first_name'] = wx.TextCtrl(panel, id = wx.ID_ANY)
+		self.textFields['last_name']  = wx.TextCtrl(panel, id = wx.ID_ANY,pos = (200, 0))
+
 		#事件
-		self.Bind(wx.EVT_BUTTON, self.OnClick, button)
 		self.Bind(wx.EVT_MENU, self.OnText, textMenuItem)
 		self.Bind(wx.EVT_MENU, self.OnChoice, colorMenuItem)
 		self.Bind(wx.EVT_LEFT_DCLICK, self.DoubleClick, panel)
+
+		self.nameModel = namemodel.NameModel('', '')
+		self.nameModel.addListener(self.OnUpdate)
+
+	def OnUpdate(self, model):
+		self.textFields['first_name'].SetValue(model.firstName)
+		self.textFields['last_name'].SetValue(model.lastName)
 
 	def DoubleClick(self, e):
 		print u'双击'
@@ -67,7 +79,9 @@ class MyFrame(wx.Frame):
 		dlg.Destroy()
 
 	def OnButton(self, e):
-		self.Close()
+		first = u'李';
+		last = u'雷';
+		self.nameModel.set(first, last)
 
 
 if __name__ == '__main__':
